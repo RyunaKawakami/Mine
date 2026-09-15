@@ -1,7 +1,7 @@
-export { auth as proxy } from "@/auth";
+import { NextResponse } from "next/server";
 
-export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
-};
+// The MVP demo uses a browser-local session. Keep this pass-through proxy so
+// real Auth.js protection can be restored later without changing route files.
+export function proxy() {
+  return NextResponse.next();
+}

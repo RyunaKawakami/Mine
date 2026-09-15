@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">鎌倉の海</title><desc id="desc">夕暮れの海と砂浜を描いた抽象的な風景</desc>
+  <defs><linearGradient id="sunset" x2="0" y2="1"><stop stop-color="#96afbd"/><stop offset=".55" stop-color="#e6ad8c"/><stop offset="1" stop-color="#d4785e"/></linearGradient></defs>
+  <rect width="1200" height="900" fill="url(#sunset)"/><circle cx="290" cy="330" r="105" fill="#ffe1b1" opacity=".9"/>
+  <path d="M0 490q170-45 340 0t340 0 340 0 220 0v300H0Z" fill="#527c87"/><path d="M0 575q190-55 390 0t390 0 420 0v215H0Z" fill="#729ca1"/><path d="M0 680q260-70 520 0t680 0v220H0Z" fill="#d8b58f"/><path d="M0 730q230-40 470 10t730-5" fill="none" stroke="#f2e3ce" stroke-width="22" opacity=".85"/>
+  <g fill="#313d42"><path d="m820 280 45 14-45 13 20-13Z"/><path d="m900 230 35 11-35 11 15-11Z"/></g>
+</svg>

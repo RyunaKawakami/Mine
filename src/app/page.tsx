@@ -1,122 +1,90 @@
-import { ArrowRight, Heart, LogOut, MapPinned } from "lucide-react";
+"use client";
 
-import { PageContainer } from "@/components/layout/page-container";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { siteConfig } from "@/config/site";
-import { signOutFromMine } from "@/features/auth/actions/sign-out";
-import { requireAlbumMember } from "@/lib/auth/authorize";
+import { ArrowRight, Heart, MapPin, Plus } from "lucide-react";
+import Link from "next/link";
 
-const foundations = [
-  "Next.js 16 · App Router",
-  "TypeScript · strict",
-  "Tailwind CSS 4",
-  "Vitest · Playwright",
-] as const;
+import { useDemo } from "@/features/demo/demo-store";
+import { JapanMap } from "@/features/map/components/japan-map";
+import { TripCard } from "@/features/trips/components/trip-card";
 
-export default async function HomePage() {
-  const album = await requireAlbumMember();
+export default function HomePage() {
+  const { trips } = useDemo();
+  const visited = new Set(trips.flatMap((trip) => trip.prefectureIds)).size;
+  const recent = [...trips]
+    .sort((a, b) => b.startDate.localeCompare(a.startDate))
+    .slice(0, 3);
 
   return (
-    <main className="relative min-h-screen overflow-hidden py-8 sm:py-12 lg:py-16">
-      <div
-        aria-hidden="true"
-        className="absolute -top-36 -right-32 size-96 rounded-full bg-[#dfc9ba]/35 blur-3xl"
-      />
-      <PageContainer>
-        <header className="border-line flex items-center justify-between border-b pb-5">
-          <a
-            className="font-serif text-2xl font-semibold tracking-[-0.04em]"
-            href="#top"
-          >
-            {siteConfig.name}
-          </a>
-          <div className="flex items-center gap-3">
-            <StatusBadge>Phase 3 ready</StatusBadge>
-            <form action={signOutFromMine}>
-              <button
-                aria-label="ログアウト"
-                className="border-line bg-surface text-muted hover:border-terracotta/30 hover:text-terracotta grid size-10 place-items-center rounded-full border transition-colors"
-                type="submit"
-              >
-                <LogOut aria-hidden="true" className="size-4" />
-              </button>
-            </form>
-          </div>
-        </header>
+    <div className="page-wrap">
+      <section className="home-hero">
+        <div>
+          <p className="eyebrow">
+            <Heart aria-hidden="true" fill="currentColor" /> Our travel archive
+          </p>
+          <h1>
+            ふたりで訪れた、
+            <br />
+            <em>{visited}</em>の都道府県。
+          </h1>
+          <p>地図をたどると、その日の景色や会話がそっと戻ってくる。</p>
+        </div>
+        <Link className="primary-button" href="/trips/new">
+          <Plus aria-hidden="true" />
+          思い出を追加
+        </Link>
+      </section>
 
-        <section
-          className="grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-[1.06fr_0.94fr] lg:gap-20 lg:py-28"
-          id="top"
-        >
+      <section className="map-panel">
+        <div className="map-panel-heading">
           <div>
-            <p className="text-sage mb-5 flex items-center gap-2 text-sm font-semibold tracking-[0.16em] uppercase">
-              <Heart
-                aria-hidden="true"
-                className="size-4"
-                fill="currentColor"
-              />
-              Private travel album
-            </p>
-            <h1 className="max-w-2xl font-serif text-5xl leading-[1.16] font-medium tracking-[-0.045em] text-balance sm:text-6xl lg:text-7xl">
-              ふたりでつくる、
-              <br />
-              旅と思い出の地図。
-            </h1>
-            <p className="text-muted mt-7 max-w-xl text-base leading-8 sm:text-lg">
-              写真と場所を手がかりに、ふたりの旅を何度でも振り返るためのプライベートアルバムです。
-            </p>
-            <p className="text-sage mt-4 text-sm">
-              {album.userName ? `${album.userName}さん、` : ""}
-              {album.albumName}へようこそ。
-            </p>
-
-            <div className="mt-9 flex flex-wrap gap-2.5" aria-label="開発基盤">
-              {foundations.map((foundation) => (
-                <span
-                  className="border-line bg-surface/70 text-muted rounded-full border px-3.5 py-2 text-xs font-medium shadow-[0_8px_24px_rgb(72_54_40_/_0.04)]"
-                  key={foundation}
-                >
-                  {foundation}
-                </span>
-              ))}
-            </div>
+            <p className="eyebrow">Our Japan</p>
+            <h2>思い出の地図</h2>
           </div>
-
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div className="bg-surface rotate-2 rounded-[2rem] border border-white/60 p-4 shadow-[0_28px_80px_rgb(73_50_34_/_0.14)] sm:p-5">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[1.45rem] bg-[linear-gradient(145deg,#83917a_0%,#536252_35%,#c69f82_36%,#e1c8b4_64%,#9b674f_65%,#744735_100%)]">
-                <div className="absolute inset-x-6 top-6 flex items-center justify-between text-white/95">
-                  <span className="text-xs font-semibold tracking-[0.18em] uppercase">
-                    Our journey
-                  </span>
-                  <MapPinned aria-hidden="true" className="size-5" />
-                </div>
-                <div className="absolute right-5 bottom-5 left-5 rounded-2xl border border-white/35 bg-[#2f2a26]/38 p-5 text-white backdrop-blur-md">
-                  <p className="text-xs tracking-[0.14em] text-white/75 uppercase">
-                    Coming next
-                  </p>
-                  <p className="mt-2 font-serif text-2xl">
-                    思い出を記録する準備ができました
-                  </p>
-                  <p className="mt-3 flex items-center gap-2 text-sm text-white/80">
-                    Phase 4 · Layout & Navigation
-                    <ArrowRight aria-hidden="true" className="size-4" />
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div
-              aria-hidden="true"
-              className="border-terracotta/15 absolute -bottom-8 -left-7 -z-10 size-36 rounded-full border"
-            />
+          <div className="map-stat">
+            <strong>{visited}</strong>
+            <span>/ 47 visited</span>
           </div>
-        </section>
+        </div>
+        <JapanMap trips={trips} />
+        <p className="map-note">
+          <MapPin aria-hidden="true" />
+          色のついた都道府県を選ぶと、旅の記録を見られます。
+        </p>
+      </section>
 
-        <footer className="border-line text-muted flex flex-col gap-2 border-t py-5 text-xs sm:flex-row sm:items-center sm:justify-between">
-          <p>Mine · Couple travel memories</p>
-          <p>Database and private access boundary verified in code.</p>
-        </footer>
-      </PageContainer>
-    </main>
+      <section className="content-section">
+        <div className="content-heading">
+          <div>
+            <p className="eyebrow">Recent stories</p>
+            <h2>最近の思い出</h2>
+          </div>
+          <Link href="/memories">
+            すべて見る <ArrowRight aria-hidden="true" />
+          </Link>
+        </div>
+        {recent.length ? (
+          <div className="trip-grid">
+            {recent.map((trip) => (
+              <TripCard trip={trip} key={trip.id} />
+            ))}
+          </div>
+        ) : (
+          <EmptyTrips />
+        )}
+      </section>
+    </div>
+  );
+}
+
+function EmptyTrips() {
+  return (
+    <div className="empty-state">
+      <Heart aria-hidden="true" />
+      <h2>最初の旅を残しましょう</h2>
+      <p>写真がなくても、場所とひとことから始められます。</p>
+      <Link className="primary-button" href="/trips/new">
+        思い出を追加
+      </Link>
+    </div>
   );
 }

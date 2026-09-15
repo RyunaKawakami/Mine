@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">秋色の京都</title><desc id="desc">紅葉と寺院の屋根を描いた抽象的な風景</desc>
+  <defs><linearGradient id="bg" x2="0" y2="1"><stop stop-color="#dfb585"/><stop offset="1" stop-color="#755243"/></linearGradient></defs>
+  <rect width="1200" height="900" fill="url(#bg)"/><circle cx="870" cy="180" r="125" fill="#f4dfb6" opacity=".8"/>
+  <g fill="#9f4737"><circle cx="130" cy="160" r="140"/><circle cx="320" cy="90" r="125"/><circle cx="1070" cy="310" r="160"/></g><g fill="#c26b42"><circle cx="90" cy="360" r="120"/><circle cx="410" cy="260" r="150"/><circle cx="980" cy="90" r="130"/></g>
+  <path d="M220 590h760L820 450H380Z" fill="#292d2a"/><path d="M310 585h580v260H310Z" fill="#493b32"/><path d="M360 610h480v235H360Z" fill="#d5bb91"/><g stroke="#564637" stroke-width="18"><path d="M440 610v235M540 610v235M650 610v235M760 610v235"/></g>
+  <path d="M0 830q300-80 600 0t600 0v70H0Z" fill="#273b34" opacity=".8"/>
+</svg>

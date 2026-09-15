@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import { siteConfig } from "@/config/site";
+import { AppShell } from "@/components/layout/app-shell";
+import { DemoProvider } from "@/features/demo/demo-store";
 
 import "./globals.css";
 
@@ -24,7 +26,11 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        <DemoProvider>
+          <AppShell>{children}</AppShell>
+        </DemoProvider>
+      </body>
     </html>
   );
 }

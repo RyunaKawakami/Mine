@@ -2,7 +2,7 @@
 
 ふたりでつくる、旅と思い出の地図。
 
-Mineは、カップルで訪れた場所と写真を日本地図から振り返る、プライベートな旅行アルバムです。Phase 2・3のコード実装まで完了しています。データベース適用とGoogle実ログインには、無料サービスの接続情報が必要です。
+Mineは、カップルで訪れた場所と写真を日本地図から振り返る、プライベートな旅行アルバムです。現在は、外部サービスなし・完全無料で主要機能を体験できるブラウザローカル版です。
 
 ## Current state
 
@@ -12,11 +12,14 @@ Mineは、カップルで訪れた場所と写真を日本地図から振り返�
 - VitestとPlaywrightのテスト基盤
 - ESLint、Prettier、TypeScript、本番ビルドを検査するCI
 - `GET /api/health` ヘルスエンドポイント
-- Prisma ORM 7のスキーマ、初期migration、47都道府県seed
-- Auth.js、Google OAuth、2アカウントの許可リスト
-- アルバム単位の認可境界と保護ルート
-
-旅行CRUDなどの機能は後続Phaseで追加します。全体計画は[`docs/architecture-plan.md`](docs/architecture-plan.md)を参照してください。
+- デモログインとレスポンシブナビゲーション
+- 旅行の追加・表示・編集・削除
+- 47都道府県の操作可能な地図と都道府県別ページ
+- スポットの追加・編集・削除
+- 端末内の写真追加、キャプション編集、ギャラリー
+- 思い出タイムラインとプロフィール統計
+- ローディング、空表示、エラー、Not Found表示
+- Prisma/Auth.jsの本番向け基盤（接続は任意・現在は未使用）
 
 ## Requirements
 
@@ -46,7 +49,6 @@ corepack enable pnpm
 
 ```bash
 pnpm install
-cp .env.example .env.local
 pnpm dev
 ```
 
@@ -56,9 +58,13 @@ Windows PowerShellでは、環境変数ファイルを次のように作成で�
 Copy-Item .env.example .env.local
 ```
 
-ブラウザで`http://localhost:3000`を開きます。ヘルスチェックは`http://localhost:3000/api/health`です。
+ブラウザで`http://localhost:3000`を開き、「デモをはじめる」を押してください。`.env.local`、データベース、Googleアカウントは不要です。ヘルスチェックは`http://localhost:3000/api/health`です。
 
-認証済み画面を動かすには、以下の無料サービス設定を完了してください。本番ビルド自体は接続情報なしでも実行できます。
+デモの旅行・スポット・写真はブラウザの`localStorage`だけに保存され、外部へ送信されません。プロフィール画面から初期サンプルへ戻せます。ブラウザの保存容量を考慮し、写真は1枚1.5MB以下・1旅行12枚までです。
+
+## Optional production infrastructure (deferred)
+
+以下は将来、本番用ログインと複数端末同期が必要になった場合だけ使う任意設定です。現在のデモには不要です。
 
 ## Free database setup
 
@@ -73,7 +79,7 @@ pnpm db:seed
 
 seedはupsert方式なので、安全に再実行できます。
 
-## Free Google OAuth setup
+## Free Google OAuth setup (deferred)
 
 1. Google Cloud Consoleでプロジェクトと「ウェブアプリケーション」OAuthクライアントを作成します。
 2. 承認済みJavaScript生成元に`http://localhost:3000`を追加します。
@@ -129,6 +135,14 @@ Phase 2以降で使用する主な変数:
 
 ルートファイルはページ構成に集中させ、機能固有コードは`src/features`、全体共有UIは`src/components`、インフラ接続は`src/lib`へ配置します。ディレクトリは実際に必要になったPhaseで作成します。
 
+## Demo limitations
+
+- デモログインは本人確認を行わず、画面遷移を確認するためのものです。
+- データは現在のブラウザだけに保存され、別端末とは同期されません。
+- ブラウザデータを削除すると登録内容も消えます。
+- 地図はライセンス不要の都道府県タイル表現です。正式な地理SVGは後回しです。
+- 本番公開前にAuth.js、PostgreSQL、非公開画像ストレージを再接続し、セキュリティテストを行います。
+
 ## Roadmap
 
-次はPhase 4として、認証後の共通レイアウトとレスポンシブナビゲーションを実装します。
+Phase 4〜14の主要UXをデモ実装済みです。今後は実運用を決めた時点で、本番認証・永続DB・非公開ストレージへの置き換えを行います。

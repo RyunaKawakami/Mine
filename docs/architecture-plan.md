@@ -1,6 +1,6 @@
 # Mine — Architecture and Implementation Plan
 
-Status: Approved — Phase 1 implemented
+Status: Interactive local demo complete through Phase 14
 Last updated: 2026-09-15
 
 ## 1. Specification review
@@ -17,6 +17,12 @@ The MVP has these user journeys:
 6. Browse all memories chronologically and view simple statistics.
 
 The workspace was empty when this review began. The plan was approved before application work started, and Phase 1 now provides the verified project foundation.
+
+### Demo implementation decision
+
+The complete product journey is currently implemented as a zero-cost local demo. A one-button browser-local session replaces Google OAuth, and `localStorage` replaces PostgreSQL and cloud image storage at runtime. This makes navigation, trip CRUD, prefecture relations, map interaction, photo selection, spots, memories, and statistics testable without accounts, credentials, billing, or network calls. The Prisma/Auth.js foundation remains in the repository for a later production-hardening pass, but is not required to run the demo.
+
+Demo photos remain in the current browser and are limited to 1.5 MB each and 12 per trip. The interactive map uses an accessible, license-free prefecture tile arrangement rather than geographic SVG paths. These are deliberate demo constraints, not production security or persistence guarantees.
 
 ## 2. Decisions and open points
 
@@ -479,6 +485,8 @@ Done when only approved accounts can enter and an authenticated user cannot read
 
 Depends on: Phase 1 and Phase 3.
 
+Status: Demo complete (2026-09-15).
+
 Tasks:
 
 - Implement color, typography, spacing, radius, shadow, focus, and motion tokens.
@@ -494,6 +502,8 @@ Done when login and protected navigation work responsively, even though feature 
 
 Depends on: Phases 2–4.
 
+Status: Demo complete with browser-local persistence (2026-09-15).
+
 - Implement trip schemas, repositories, services, queries, actions, forms, list/card/detail views, and deletion confirmation.
 - Create/update trip, participants, and the initial prefecture selection atomically.
 - Test date validation, album scoping, participant membership, and empty states.
@@ -501,6 +511,8 @@ Depends on: Phases 2–4.
 ### Phase 6 — Prefecture relations and pages
 
 Depends on: Phase 5 and seeded prefectures from Phase 2.
+
+Status: Demo complete (2026-09-15).
 
 - Implement multi-prefecture selection, derived visited/count queries, and `/prefectures/[id]`.
 - Prevent a prefecture from being removed while a spot still references it unless the user resolves the spot.
@@ -510,6 +522,8 @@ Depends on: Phase 5 and seeded prefectures from Phase 2.
 
 Depends on: Phase 6; approved/licensed SVG geometry.
 
+Status: Demo complete using an accessible prefecture tile map; geographic SVG deferred (2026-09-15).
+
 - Normalize and optimize the 47 prefecture paths.
 - Implement visited/unvisited states, hover/tap/focus tooltip, keyboard activation, and navigation.
 - Provide an accessible prefecture-list fallback and test map utilities.
@@ -517,6 +531,8 @@ Depends on: Phase 6; approved/licensed SVG geometry.
 ### Phase 8 — Photo upload
 
 Depends on: Phase 5; storage and upload-limit decisions.
+
+Status: Demo complete using browser-local Data URLs; cloud upload deferred (2026-09-15).
 
 - Implement authenticated client upload, server verification, metadata persistence, responsive image delivery, ordering, caption editing, and deletion cleanup.
 - Build mobile multi-file selection with progress, retry, and partial-failure handling.
@@ -526,12 +542,16 @@ Depends on: Phase 5; storage and upload-limit decisions.
 
 Depends on: Phases 6 and 8.
 
+Status: Demo complete (2026-09-15).
+
 - Implement repeatable spot fields, ordering, edit/delete, optional coordinates, optional dates, and optional photo association.
 - Validate trip/prefecture/photo consistency in a transaction.
 
 ### Phase 10 — Memories
 
 Depends on: Phases 5 and 8.
+
+Status: Demo complete (2026-09-15).
 
 - Implement newest-first photo-led cards and pagination/cursor loading.
 - Shape queries now for later year, prefecture, and favorite filters without adding unfinished controls.
@@ -540,12 +560,16 @@ Depends on: Phases 5 and 8.
 
 Depends on: Phases 5, 6, and 8.
 
+Status: Demo complete (2026-09-15).
+
 - Implement distinct visited-prefecture, trip, and photo counts scoped to the album.
 - Add zero-state and query tests.
 
 ### Phase 12 — UI polish and responsive optimization
 
 Depends on: Phases 7–11.
+
+Status: Demo complete in code; device visual QA remains recommended (2026-09-15).
 
 - Perform photo-first visual polish, motion-reduction support, image sizing, mobile form ergonomics, and all target-width checks.
 - Audit text contrast, focus, labels, alt text, loading stability, and empty/error states.
@@ -554,6 +578,8 @@ Depends on: Phases 7–11.
 
 Depends on: all feature phases. Tests are written throughout; this phase closes systemic gaps.
 
+Status: Demo test scenarios and feedback boundaries implemented; production security hardening deferred (2026-09-15).
+
 - Complete unit/integration coverage for validation, visited calculation, authorization, and storage behavior.
 - Add Playwright critical paths: sign-in fixture, create/edit/view trip, map navigation, upload failure, and access denial.
 - Add structured server logging without secrets, error boundaries, not-found behavior, and production build checks.
@@ -561,6 +587,8 @@ Depends on: all feature phases. Tests are written throughout; this phase closes 
 ### Phase 14 — Documentation and release readiness
 
 Depends on: Phase 13.
+
+Status: Local demo documentation complete (2026-09-15); hosted production release intentionally deferred.
 
 - Complete README, architecture summary, Mermaid ERD, environment/setup/migration/seed/deploy instructions, roadmap, screenshots, and license notices.
 - Verify a fresh setup and production deployment checklist.
