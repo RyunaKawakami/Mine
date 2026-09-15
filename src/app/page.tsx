@@ -1,8 +1,10 @@
-import { ArrowRight, Heart, MapPinned } from "lucide-react";
+import { ArrowRight, Heart, LogOut, MapPinned } from "lucide-react";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { siteConfig } from "@/config/site";
+import { signOutFromMine } from "@/features/auth/actions/sign-out";
+import { requireAlbumMember } from "@/lib/auth/authorize";
 
 const foundations = [
   "Next.js 16 · App Router",
@@ -11,7 +13,9 @@ const foundations = [
   "Vitest · Playwright",
 ] as const;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const album = await requireAlbumMember();
+
   return (
     <main className="relative min-h-screen overflow-hidden py-8 sm:py-12 lg:py-16">
       <div
@@ -26,7 +30,18 @@ export default function HomePage() {
           >
             {siteConfig.name}
           </a>
-          <StatusBadge>Phase 1 ready</StatusBadge>
+          <div className="flex items-center gap-3">
+            <StatusBadge>Phase 3 ready</StatusBadge>
+            <form action={signOutFromMine}>
+              <button
+                aria-label="ログアウト"
+                className="border-line bg-surface text-muted hover:border-terracotta/30 hover:text-terracotta grid size-10 place-items-center rounded-full border transition-colors"
+                type="submit"
+              >
+                <LogOut aria-hidden="true" className="size-4" />
+              </button>
+            </form>
+          </div>
         </header>
 
         <section
@@ -49,6 +64,10 @@ export default function HomePage() {
             </h1>
             <p className="text-muted mt-7 max-w-xl text-base leading-8 sm:text-lg">
               写真と場所を手がかりに、ふたりの旅を何度でも振り返るためのプライベートアルバムです。
+            </p>
+            <p className="text-sage mt-4 text-sm">
+              {album.userName ? `${album.userName}さん、` : ""}
+              {album.albumName}へようこそ。
             </p>
 
             <div className="mt-9 flex flex-wrap gap-2.5" aria-label="開発基盤">
@@ -80,7 +99,7 @@ export default function HomePage() {
                     思い出を記録する準備ができました
                   </p>
                   <p className="mt-3 flex items-center gap-2 text-sm text-white/80">
-                    Phase 2 · Database & Prisma
+                    Phase 4 · Layout & Navigation
                     <ArrowRight aria-hidden="true" className="size-4" />
                   </p>
                 </div>
@@ -95,7 +114,7 @@ export default function HomePage() {
 
         <footer className="border-line text-muted flex flex-col gap-2 border-t py-5 text-xs sm:flex-row sm:items-center sm:justify-between">
           <p>Mine · Couple travel memories</p>
-          <p>Foundation verified before feature development.</p>
+          <p>Database and private access boundary verified in code.</p>
         </footer>
       </PageContainer>
     </main>

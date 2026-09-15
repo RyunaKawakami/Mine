@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-test("shows the Mine foundation page", async ({ page }) => {
+test("redirects unauthenticated visitors to login", async ({ page }) => {
   await page.goto("/");
 
+  await expect(page).toHaveURL(/\/login/);
   await expect(
-    page.getByRole("heading", { name: "ふたりでつくる、 旅と思い出の地図。" }),
+    page.getByRole("button", { name: "Googleでログイン" }),
   ).toBeVisible();
-  await expect(page.getByText("Phase 1 ready")).toBeVisible();
 });

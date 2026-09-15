@@ -447,6 +447,8 @@ Done when a clean checkout installs, lints, typechecks, tests, builds, and start
 
 Depends on: Phase 1; database provider decision.
 
+Status: Code complete (2026-09-15); migration, seed, and integration-test execution await a free PostgreSQL connection.
+
 Tasks:
 
 - Add Prisma 7, PostgreSQL driver adapter, config, schema, initial migration, and singleton client.
@@ -459,6 +461,8 @@ Done when migration and seed succeed on an empty database and all 47 prefectures
 ### Phase 3 — Google authentication and authorization boundary
 
 Depends on: Phase 2; membership decision; Google OAuth credentials.
+
+Status: Code complete (2026-09-15); live Google OAuth verification awaits the two approved emails and OAuth credentials.
 
 Tasks:
 

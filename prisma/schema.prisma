@@ -1,0 +1,219 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AlbumRole {
+  OWNER
+  MEMBER
+}
+
+enum PrefectureRegion {
+  HOKKAIDO
+  TOHOKU
+  KANTO
+  CHUBU
+  KANSAI
+  CHUGOKU
+  SHIKOKU
+  KYUSHU
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  accounts     Account[]
+  sessions     Session[]
+  albums       AlbumMember[]
+  createdTrips Trip[]            @relation("TripCreator")
+  trips        TripParticipant[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Album {
+  id        String   @id @default(cuid())
+  slug      String   @unique @db.VarChar(64)
+  name      String   @default("Mine") @db.VarChar(120)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members AlbumMember[]
+  trips   Trip[]
+
+  @@map("albums")
+}
+
+model AlbumMember {
+  albumId  String    @map("album_id")
+  userId   String    @map("user_id")
+  role     AlbumRole @default(MEMBER)
+  joinedAt DateTime  @default(now()) @map("joined_at")
+
+  album Album @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([albumId, userId])
+  @@index([userId])
+  @@map("album_members")
+}
+
+model Trip {
+  id          String   @id @default(cuid())
+  albumId     String   @map("album_id")
+  title       String   @db.VarChar(120)
+  startDate   DateTime @map("start_date") @db.Date
+  endDate     DateTime @map("end_date") @db.Date
+  comment     String?  @db.Text
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  album        Album             @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  createdBy    User              @relation("TripCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  participants TripParticipant[]
+  prefectures  TripPrefecture[]
+  spots        Spot[]
+  photos       Photo[]
+
+  @@index([albumId, startDate])
+  @@index([createdById])
+  @@map("trips")
+}
+
+model TripParticipant {
+  tripId String @map("trip_id")
+  userId String @map("user_id")
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([tripId, userId])
+  @@index([userId])
+  @@map("trip_participants")
+}
+
+model Prefecture {
+  id     Int              @id
+  code   String           @unique @db.VarChar(2)
+  name   String           @unique @db.VarChar(8)
+  nameEn String           @unique @map("name_en") @db.VarChar(24)
+  region PrefectureRegion
+
+  trips TripPrefecture[]
+  spots Spot[]
+
+  @@map("prefectures")
+}
+
+model TripPrefecture {
+  tripId       String   @map("trip_id")
+  prefectureId Int      @map("prefecture_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  trip       Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  prefecture Prefecture @relation(fields: [prefectureId], references: [id], onDelete: Restrict)
+
+  @@id([tripId, prefectureId])
+  @@index([prefectureId, tripId])
+  @@map("trip_prefectures")
+}
+
+model Spot {
+  id           String    @id @default(cuid())
+  tripId       String    @map("trip_id")
+  prefectureId Int       @map("prefecture_id")
+  name         String    @db.VarChar(120)
+  comment      String?   @db.Text
+  latitude     Decimal?  @db.Decimal(9, 6)
+  longitude    Decimal?  @db.Decimal(9, 6)
+  visitedAt    DateTime? @map("visited_at") @db.Date
+  position     Int       @default(0)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  trip       Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  prefecture Prefecture @relation(fields: [prefectureId], references: [id], onDelete: Restrict)
+  photos     Photo[]
+
+  @@index([tripId, position])
+  @@index([prefectureId])
+  @@map("spots")
+}
+
+model Photo {
+  id         String    @id @default(cuid())
+  tripId     String    @map("trip_id")
+  spotId     String?   @map("spot_id")
+  imageUrl   String    @map("image_url") @db.Text
+  storageKey String    @unique @map("storage_key")
+  caption    String?   @db.VarChar(500)
+  takenAt    DateTime? @map("taken_at")
+  width      Int
+  height     Int
+  mimeType   String    @map("mime_type") @db.VarChar(100)
+  bytes      Int
+  position   Int       @default(0)
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  trip Trip  @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  spot Spot? @relation(fields: [spotId], references: [id], onDelete: SetNull)
+
+  @@index([tripId, position])
+  @@index([spotId])
+  @@index([takenAt])
+  @@map("photos")
+}

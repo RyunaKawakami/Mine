@@ -2,7 +2,7 @@
 
 ふたりでつくる、旅と思い出の地図。
 
-Mineは、カップルで訪れた場所と写真を日本地図から振り返る、プライベートな旅行アルバムです。現在はPhase 1（プロジェクト基盤）まで実装済みです。
+Mineは、カップルで訪れた場所と写真を日本地図から振り返る、プライベートな旅行アルバムです。Phase 2・3のコード実装まで完了しています。データベース適用とGoogle実ログインには、無料サービスの接続情報が必要です。
 
 ## Current state
 
@@ -12,8 +12,11 @@ Mineは、カップルで訪れた場所と写真を日本地図から振り返�
 - VitestとPlaywrightのテスト基盤
 - ESLint、Prettier、TypeScript、本番ビルドを検査するCI
 - `GET /api/health` ヘルスエンドポイント
+- Prisma ORM 7のスキーマ、初期migration、47都道府県seed
+- Auth.js、Google OAuth、2アカウントの許可リスト
+- アルバム単位の認可境界と保護ルート
 
-データベース、認証、旅行機能は後続Phaseで追加します。全体計画は[`docs/architecture-plan.md`](docs/architecture-plan.md)を参照してください。
+旅行CRUDなどの機能は後続Phaseで追加します。全体計画は[`docs/architecture-plan.md`](docs/architecture-plan.md)を参照してください。
 
 ## Requirements
 
@@ -55,7 +58,36 @@ Copy-Item .env.example .env.local
 
 ブラウザで`http://localhost:3000`を開きます。ヘルスチェックは`http://localhost:3000/api/health`です。
 
-Phase 1では外部サービスを使わないため、`.env.local`がなくても開発サーバーと本番ビルドは動作します。
+認証済み画面を動かすには、以下の無料サービス設定を完了してください。本番ビルド自体は接続情報なしでも実行できます。
+
+## Free database setup
+
+1. [Neon](https://neon.com/)でカード登録不要のFreeプランを選び、PostgreSQLプロジェクトを1つ作成します。
+2. pooled接続URLを`DATABASE_URL`、direct接続URLを`DIRECT_URL`として`.env.local`へ設定します。
+3. 初期migrationとseedを適用します。
+
+```bash
+pnpm db:deploy
+pnpm db:seed
+```
+
+seedはupsert方式なので、安全に再実行できます。
+
+## Free Google OAuth setup
+
+1. Google Cloud Consoleでプロジェクトと「ウェブアプリケーション」OAuthクライアントを作成します。
+2. 承認済みJavaScript生成元に`http://localhost:3000`を追加します。
+3. 承認済みリダイレクトURIに`http://localhost:3000/api/auth/callback/google`を追加します。
+4. Client IDとClient Secretを`AUTH_GOOGLE_ID`、`AUTH_GOOGLE_SECRET`へ設定します。
+5. ランダムな`AUTH_SECRET`と、利用する2つのメールアドレスを設定します。
+
+```dotenv
+AUTH_SECRET=32バイト以上のランダムな値
+MINE_ALLOWED_EMAILS=user-a@example.com,user-b@example.com
+MINE_ALBUM_SLUG=mine
+```
+
+課金対象APIは有効化しません。Google側でBillingの有効化を求められた場合は、その設定を中止してください。
 
 ## Commands
 
@@ -66,6 +98,7 @@ pnpm start        # 本番サーバー
 pnpm lint         # ESLint
 pnpm typecheck    # TypeScript
 pnpm test         # Vitest
+pnpm test:integration # TEST_DATABASE_URLを使うDB統合テスト
 pnpm test:e2e     # Playwright（事前にブラウザー導入が必要）
 pnpm format       # Prettierで整形
 pnpm check        # lint・型・unit test・formatを一括検査
@@ -84,6 +117,7 @@ pnpm exec playwright install chromium
 Phase 2以降で使用する主な変数:
 
 - `DATABASE_URL`
+- `DIRECT_URL`
 - `AUTH_SECRET`
 - `AUTH_GOOGLE_ID`
 - `AUTH_GOOGLE_SECRET`
@@ -97,4 +131,4 @@ Phase 2以降で使用する主な変数:
 
 ## Roadmap
 
-次はPhase 2として、PostgreSQL、Prisma、47都道府県のseed、repository境界を実装します。
+次はPhase 4として、認証後の共通レイアウトとレスポンシブナビゲーションを実装します。

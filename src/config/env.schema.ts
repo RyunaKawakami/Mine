@@ -25,6 +25,13 @@ export const serverEnvSchema = z.object({
       .regex(/^postgres(?:ql)?:\/\//, "PostgreSQL connection URL is required")
       .optional(),
   ),
+  DIRECT_URL: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z
+      .string()
+      .regex(/^postgres(?:ql)?:\/\//, "PostgreSQL connection URL is required")
+      .optional(),
+  ),
   BLOB_READ_WRITE_TOKEN: optionalSecret,
   MINE_ALBUM_SLUG: z
     .preprocess(
