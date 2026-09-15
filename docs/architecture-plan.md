@@ -1,6 +1,6 @@
 # Mine — Architecture and Implementation Plan
 
-Status: Draft for approval  
+Status: Approved — Phase 1 implemented
 Last updated: 2026-09-15
 
 ## 1. Specification review
@@ -16,30 +16,42 @@ The MVP has these user journeys:
 5. Create or edit a trip with multiple prefectures, spots, and photos.
 6. Browse all memories chronologically and view simple statistics.
 
-The supplied workspace is currently empty. No application code has been created, in accordance with the instruction to finish design before implementation.
+The workspace was empty when this review began. The plan was approved before application work started, and Phase 1 now provides the verified project foundation.
 
 ## 2. Decisions and open points
 
+### Zero-cost constraint
+
+The application must remain free to develop and operate during the MVP:
+
+- Use open-source local tooling and free service plans only.
+- Do not enter payment details, start paid trials, upgrade plans, buy a custom domain, or enable pay-as-you-go billing.
+- Prefer free plans that suspend or reject usage after their allowance instead of creating overage charges.
+- Use Vercel Hobby, Neon Free, the Vercel Blob Hobby allowance, and the default `vercel.app` domain.
+- If a provider asks to enable billing, stop that setup and select a free alternative or request explicit approval. Silence is never approval to incur a charge.
+- Recheck official pricing and limits immediately before connecting any hosted service because free plans can change.
+- When a free allowance is reached, reduced availability is acceptable; automatic paid continuation is not.
+
 ### Recommended decisions
 
-| Area | Decision | Reason |
-| --- | --- | --- |
-| Privacy boundary | Add `Album` and `AlbumMember` | Authentication identifies a person; an album membership determines which private data they may access. |
-| Two-person setup | Allowlisted Google accounts in `MINE_ALLOWED_EMAILS` for MVP | Smallest secure onboarding flow for a private two-user deployment. Replace with invitations later. |
-| Trip participation | Explicit `TripParticipant` join model | Supports both users today and more users later without changing the relation shape. |
-| Visited prefectures | Explicit `TripPrefecture` join model | `visited` remains derived; visit and photo counts come from relations. |
-| Mutations | Server Functions/Actions | Avoids building duplicate internal REST endpoints. Route Handlers remain for Auth.js and storage callbacks/signatures. |
-| Authorization | Central server-only DAL plus checks in every mutation | UI hiding and route-level checks are not security boundaries. |
-| Production database | Managed PostgreSQL through Vercel Marketplace; Neon is the default proposal | Simple Vercel integration and standard PostgreSQL portability. Local development may use Docker PostgreSQL. |
-| Images | Vercel Private Blob behind a `StorageService` interface | Private delivery matches the product promise, integrates with Vercel, and still permits later provider replacement. |
-| Japan map | Local, optimized SVG with one accessible interactive element per prefecture | No runtime map API is required and the map remains keyboard-operable. |
-| Date handling | Trip dates are date-only; timestamps are stored in UTC and shown in `Asia/Tokyo` | Prevents a trip date shifting because of timezone conversion. |
+| Area                | Decision                                                                         | Reason                                                                                                                   |
+| ------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Privacy boundary    | Add `Album` and `AlbumMember`                                                    | Authentication identifies a person; an album membership determines which private data they may access.                   |
+| Two-person setup    | Allowlisted Google accounts in `MINE_ALLOWED_EMAILS` for MVP                     | Smallest secure onboarding flow for a private two-user deployment. Replace with invitations later.                       |
+| Trip participation  | Explicit `TripParticipant` join model                                            | Supports both users today and more users later without changing the relation shape.                                      |
+| Visited prefectures | Explicit `TripPrefecture` join model                                             | `visited` remains derived; visit and photo counts come from relations.                                                   |
+| Mutations           | Server Functions/Actions                                                         | Avoids building duplicate internal REST endpoints. Route Handlers remain for Auth.js and storage callbacks/signatures.   |
+| Authorization       | Central server-only DAL plus checks in every mutation                            | UI hiding and route-level checks are not security boundaries.                                                            |
+| Production database | Neon Free PostgreSQL                                                             | No-card free plan, simple Vercel integration, and standard PostgreSQL portability. Local development may use PostgreSQL. |
+| Images              | Vercel Private Blob on Hobby, behind a `StorageService` interface                | Private delivery matches the product promise; Hobby usage stops at its free allowance instead of creating overages.      |
+| Japan map           | Local, optimized SVG with one accessible interactive element per prefecture      | No runtime map API is required and the map remains keyboard-operable.                                                    |
+| Date handling       | Trip dates are date-only; timestamps are stored in UTC and shown in `Asia/Tokyo` | Prevents a trip date shifting because of timezone conversion.                                                            |
 
 ### Items requiring approval before their dependent phase
 
 1. Confirm the MVP membership rule: exactly the two email addresses in `MINE_ALLOWED_EMAILS` share one album.
-2. Confirm Neon for production PostgreSQL, or select Prisma Postgres/Supabase instead.
-3. Confirm Vercel Private Blob for production image storage.
+2. Confirm Neon Free for production PostgreSQL, or select another no-card free provider.
+3. Confirm Vercel Private Blob within the Hobby allowance for production image storage.
 4. Confirm the maximum upload policy. Proposal: JPEG, PNG, WebP, and HEIC input; 15 MB per source image; 30 photos per trip. HEIC support must be verified against the chosen upload pipeline.
 5. Select or approve the licensed SVG source for the 47 prefectures before Phase 7.
 6. Confirm deletion behavior. Proposal: deleting a trip permanently removes its database records and queues its cloud images for deletion after explicit confirmation.
@@ -50,23 +62,23 @@ None of items 2–5 blocks project scaffolding. Item 1 must be settled before th
 
 Use stable major versions and commit the package-manager lockfile. Patch/minor versions are selected when Phase 1 begins and are upgraded deliberately.
 
-| Concern | Selection |
-| --- | --- |
-| Runtime | Node.js 24 LTS |
-| Package manager | pnpm 10 |
-| Application | Next.js 16 App Router, React 19, TypeScript strict mode |
-| Styling | Tailwind CSS 4, CSS custom properties for design tokens |
-| Icons | Lucide React |
-| Database | PostgreSQL |
-| ORM | Prisma ORM 7.x initially |
-| Authentication | Auth.js with Google OAuth and Prisma adapter; database sessions |
-| Validation | Zod |
-| Forms | React Hook Form plus `@hookform/resolvers` |
-| Image storage | Vercel Private Blob through an application-owned adapter |
-| Unit/integration tests | Vitest and Testing Library |
-| Browser tests | Playwright |
-| Code quality | ESLint, Prettier, TypeScript `noUncheckedIndexedAccess` |
-| Deployment | Vercel |
+| Concern                | Selection                                                       |
+| ---------------------- | --------------------------------------------------------------- |
+| Runtime                | Node.js 24 LTS                                                  |
+| Package manager        | pnpm 10                                                         |
+| Application            | Next.js 16 App Router, React 19, TypeScript strict mode         |
+| Styling                | Tailwind CSS 4, CSS custom properties for design tokens         |
+| Icons                  | Lucide React                                                    |
+| Database               | PostgreSQL                                                      |
+| ORM                    | Prisma ORM 7.x initially                                        |
+| Authentication         | Auth.js with Google OAuth and Prisma adapter; database sessions |
+| Validation             | Zod                                                             |
+| Forms                  | React Hook Form plus `@hookform/resolvers`                      |
+| Image storage          | Vercel Private Blob through an application-owned adapter        |
+| Unit/integration tests | Vitest and Testing Library                                      |
+| Browser tests          | Playwright                                                      |
+| Code quality           | ESLint, Prettier, TypeScript `noUncheckedIndexedAccess`         |
+| Deployment             | Vercel                                                          |
 
 Prisma 8 is current, but Prisma 7 remains supported and has the lower integration risk with the Auth.js Prisma adapter and the conventional schema/migration workflow. Re-evaluate Prisma 8 after the authentication spike; do not mix both setup styles.
 
@@ -417,6 +429,8 @@ Notes:
 ## 7. Phase plan and acceptance criteria
 
 ### Phase 1 — Project setup
+
+Status: Complete (2026-09-15)
 
 Tasks:
 

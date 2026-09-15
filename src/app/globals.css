@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8f4ed;
+  --surface: #fffdf9;
+  --foreground: #302c29;
+  --muted: #746c65;
+  --line: #e7ded3;
+  --terracotta: #a85f47;
+  --terracotta-dark: #814330;
+  --sage: #66755f;
+  --selection: #ead8cc;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-dark: var(--terracotta-dark);
+  --color-sage: var(--sage);
+  --font-sans: "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+  --font-serif: "Yu Mincho", "Hiragino Mincho ProN", Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+  color: var(--foreground);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgb(255 255 255 / 72%),
+      transparent 32rem
+    ),
+    var(--background);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--terracotta) 55%, white);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
